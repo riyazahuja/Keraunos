@@ -23,16 +23,19 @@ const int drone3_yVel_pin = 12;
 void sendSignal(int pin_num, int val) {
   //to go forward w joystick, need to add 1,5V, to go back need to subtract 1.5
   //joystick remains at 1.5V when not moved
+  //maybe needs extra pin to specify whether positive or negative?
   
   if (val < 0) val = 0;
   else val = 1;
 
+  //send new val
   for (int i = pin_num; i < 13; i++4) {
     digitalWrite(i, val);
   }
 
   delay(500);
 
+  //need to reset button
   for (int i = pin_num; i < 13; i++4) {
     digitalWrite(i, val);
   }
@@ -65,7 +68,7 @@ void sendLeftJoystickSignal(int z, int turn) {
 void sendRightJoystickSignal(int x, int y) {
   //changing xVel
   if (x != 0) {
-    if (z > 0) {
+    if (x > 0) {
       //send voltage to go right to pin
     }
 
