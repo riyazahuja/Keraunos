@@ -23,16 +23,16 @@ def capture_app_window(app_title):
 
         while True:
             sct_img = sct.grab(monitor)
-            frame = np.array(sct_img)
+            imageFrame = np.array(sct_img)
 
             # Convert to BGR format for OpenCV
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+            imageFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGRA2BGR)
 
 
             # Your existing processing code starts here
             # Convert the imageFrame in BGR(RGB color space) to HSV(hue-saturation-value) color space
-            hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            imageFrame=hsvFrame
+            hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
+            #imageFrame=hsvFrame
 
             # Set range for red color and define mask
             red_lower = np.array([136, 87, 111], np.uint8)
