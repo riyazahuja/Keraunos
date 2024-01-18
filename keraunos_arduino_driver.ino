@@ -5,20 +5,8 @@ const int turnAngle = 0;
 const int xVel = 0;
 const int yVel = 0;
 
-const int drone1_zVel_pin = 1;
-const int drone1_turnAngle_pin = 2;
-const int drone1_xVel_pin = 3;
-const int drone1_yVel_pin = 4;
-
-const int drone2_zVel_pin = 5;
-const int drone2_turnAngle_pin = 6;
-const int drone2_xVel_pin = 7;
-const int drone2_yVel_pin = 8;
-
-const int drone3_zVel_pin = 9;
-const int drone3_turnAngle_pin = 10;
-const int drone3_xVel_pin = 11;
-const int drone3_yVel_pin = 12;
+//for each drone, pin 1 is zVel, pin 2 is turnAngle, pin3 is xVel, pin4 is yVel
+const int pins[12] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 
 void sendSignal(int pin_num, int val) {
   //to go forward w joystick, need to add 1,5V, to go back need to subtract 1.5
@@ -45,66 +33,35 @@ void sendSignal(int pin_num, int val) {
 void sendLeftJoystickSignal(int z, int turn) {
   //changing zVel
   if (z != 0) {
-    if (z > 0) {
-      //send voltage to go up to pin
-    }
-
-    else {
-      //send voltage to go down to pin
-    }
+    sendSignal(1, z);
   }
 
   //changing turnAngle
-  else if (turn != 0)
-    if (turn > 0) {
-      //send voltage to go up to pin
-    }
-
-    else {
-      //send voltage to go down to pin
-    }
+  else if (turn != 0) {
+    sendSignal(2, turn);
+  }
 }
 
 void sendRightJoystickSignal(int x, int y) {
   //changing xVel
   if (x != 0) {
-    if (x > 0) {
-      //send voltage to go right to pin
-    }
-
-    else {
-      //send voltage to go left to pin
-    }
+    sendSignal(3, x);
   }
 
   //changing yVel
-  else if (y != 0)
-    if (y > 0) {
-      //send voltage to go forward to pin
-    }
+  else if (y != 0) {
+    sendSignal(4, y);
+  }
 
-    else {
-      //send voltage to go backwards to pin
-    }
 }
 
 void setup() {
   Serial.println("Arduino Ready!");
 
-  pinMode(drone1_zVel_pin, OUTPUT);
-  pinMode(drone1_turnAngle_pin, OUTPUT);
-  pinMode(drone1_xVel_pin, OUTPUT);
-  pinMode(drone1_yVel_pin, OUTPUT);
-
-  pinMode(drone2_zVel_pin, OUTPUT);
-  pinMode(drone2_turnAngle_pin, OUTPUT);
-  pinMode(drone2_xVel_pin, OUTPUT);
-  pinMode(drone2_yVel_pin, OUTPUT);
-
-  pinMode(drone3_zVel_pin, OUTPUT);
-  pinMode(drone3_turnAngle_pin, OUTPUT);
-  pinMode(drone3_xVel_pin, OUTPUT);
-  pinMode(drone3_yVel_pin, OUTPUT);
+  for (int i = 0; i < 12; i++)
+  {
+    pinMode(pins[i], OUTPUT);
+  }
 
 }
 
@@ -134,7 +91,7 @@ void loop() {
       break;
 
     case 'w':
-      Serial.println("Up");
+      Serial.println("Forward");
       sendRightJoystickSignal(0, 1);
       break; 
     case 'a':
