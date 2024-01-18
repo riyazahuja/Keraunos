@@ -87,9 +87,14 @@ def capture_app_window(app_title):
             #                                     cv2.RETR_TREE, 
             #                                     cv2.CHAIN_APPROX_SIMPLE) 
             
+            # maxArea = None
+            # maxContour = None
             # for pic, contour in enumerate(contours): 
             #     area = cv2.contourArea(contour) 
-            #     if(area > 900): 
+            #     if(area > 900) and (maxArea is None or area > maxArea): 
+            #         maxArea = area
+            #         maxContour = contour
+            # if(maxContour is not None):
             #         x, y, w, h = cv2.boundingRect(contour) 
             #         imageFrame = cv2.rectangle(imageFrame, (x, y),  
             #                                 (x + w, y + h),  
