@@ -17,14 +17,14 @@ void sendSignal(int pin_num, int val) {
   else val = 1;
 
   //send new val
-  for (int i = pin_num; i < 13; i++4) {
+  for (int i = pin_num; i < 13; i= i+4) {
     digitalWrite(i, val);
   }
 
   delay(500);
 
   //need to reset button
-  for (int i = pin_num; i < 13; i++4) {
+  for (int i = pin_num; i < 13; i = i+4) {
     digitalWrite(i, val);
   }
 
@@ -66,7 +66,9 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.availiable() > 0) {
+  char recievedChar = '1';
+
+  if (Serial.available() > 0) {
     recievedChar = Serial.read();
   }
 
@@ -107,7 +109,7 @@ void loop() {
       sendRightJoystickSignal(1, 0);
       break;
 
-    case default:
+    default:
       break;
   }
 }
