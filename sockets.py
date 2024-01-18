@@ -1,15 +1,23 @@
 import numpy as np
 import cv2
 import mss
-import pygetwindow as gw
+import pywinctl as pw
+
+
 
 def capture_app_window(app_title):
-    # Find the window with the given title
-    window = gw.getWindowsWithTitle(app_title)[0]
-    window.bringToFront()
-    sct = mss.mss()
+    # Find windows with partial match of the title
+    windows = pw.getWindowsWithTitle(app_title)
 
-    with sct:
+    # Check if any window matched
+    if not windows:
+        print(f"No windows found with title: {app_title}")
+        return
+
+    window = windows[0]
+    #window.focus()
+
+    with mss.mss() as sct:
         # Define the bounding box of the window
         monitor = {"top": window.top, "left": window.left, "width": window.width, "height": window.height}
 
@@ -20,9 +28,11 @@ def capture_app_window(app_title):
             # Convert to BGR format for OpenCV
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
 
+
             # Your existing processing code starts here
             # Convert the imageFrame in BGR(RGB color space) to HSV(hue-saturation-value) color space
             hsvFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            imageFrame=hsvFrame
 
             # Set range for red color and define mask
             red_lower = np.array([136, 87, 111], np.uint8)
@@ -120,4 +130,15 @@ def capture_app_window(app_title):
                 cv2.destroyAllWindows() 
                 break
 
-capture_app_window("Your Drone App Title")
+
+
+def list_window_titles():
+    windows = pw.getAllTitles()
+    return windows
+
+titles = list_window_titles()
+for title in titles:
+    print(title)
+
+
+capture_app_window("DE FPV")
