@@ -4,7 +4,7 @@ import mss
 import pywinctl as pw
 from datetime import datetime
 import json
-
+from math import exp, ceil
 
 
 def get_webcam():
@@ -145,7 +145,7 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
                         (0, 255,0))  
             
 
-            data_out = calculateCommands((x,y,w,h),drone_id, target_region)
+            data_out = calculateCommands((x,y,w,h),drone_id, target_region,(width,height))
             print(data_out['drones'][drone_id])
             export(data_out,'data.json')
 
@@ -203,7 +203,14 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
             break
 
 
-def calculateCommands(actual_region, drone_id, target_region):
+
+#dropoff function:
+#f(x) = -100e^{-0.1*x}+100
+def plateau_and_round(x):
+    return ceil(-100 * exp(-0.1 * x)+100)
+
+
+def calculateCommands(actual_region, drone_id, target_region, window):
     x,y,w,h = actual_region
     x0,y0,w0,h0 = target_region
     role = 'LEADER' if drone_id == 1 else 'FOLLOWER'
@@ -211,37 +218,46 @@ def calculateCommands(actual_region, drone_id, target_region):
     area = w*h
     area0 = w0*h0
 
+    ww, wh= window
+    warea = ww*wh
+
     turnl=turnr=up=down=forward=back = 0
+    AREA_GRAN = 10
     
+    area = AREA_GRAN*area
+
     if area < area0:
-        forward = 1
+        forward = (area0-area)/warea* 100
     elif area > area0:
-        back = 1
+        back = (area-area0)/warea* 100
     
     if x<x0:
-        turnr = 1
-    elif x>x0+w:
-        turnl = 1
+        turnr = (x0-x)/ww * 100
+    elif x>x0+w0:
+        turnl = (x-x0-w)/ww* 100
 
     if y<y0:
-        up = 1
-    elif y>y0+h:
-        down = 1
+        up = (y0-y)/wh* 100
+    elif y>y0+h0:
+        down = (y-y0-h)/wh* 100
+
+    
 
     data = {
         'drones': {
             drone_id : {
                 'time': datetime.now().isoformat(),
                 'role': role,
-                'turnl': turnl,
-                'turnr': turnr,
-                'up': up,
-                'down': down,
-                'forward': forward,
-                'back': back
+                'turnl': plateau_and_round(turnl),
+                'turnr': plateau_and_round(turnr),
+                'up': plateau_and_round(up),
+                'down': plateau_and_round(down),
+                'forward': plateau_and_round(forward),
+                'back': plateau_and_round(back)
             }
         }
     }
+
     
 
     return data
@@ -249,8 +265,20 @@ def calculateCommands(actual_region, drone_id, target_region):
 
 def export(data,path):
     try:
-        with open(path, 'w') as file:
-            json.dump(data, file, indent=4)
+        fc = {}
+        try:
+            with open(path, 'r') as file:
+                fc = json.load(file)
+        except:
+            pass
+        
+        with open(path,'w') as file:
+            if 'drones' not in fc.keys():
+                fc['drones']={}
+            for k,v in data.items():
+                fc['drones'][k]=v
+            
+            json.dump(fc, file, indent=4)
     except Exception as e:
         print(f"An error occurred: {e}")
 
