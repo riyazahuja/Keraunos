@@ -1,0 +1,16 @@
+{
+    "drones": {
+        "drones": {
+            "1": {
+                "time": "2024-01-19T15:40:17.413254",
+                "role": "LEADER",
+                "turnl": 0,
+                "turnr": 0,
+                "up": 0,
+                "down": 0,
+                "forward": 89,
+                "back": 0
+            }
+        }
+    }
+}
