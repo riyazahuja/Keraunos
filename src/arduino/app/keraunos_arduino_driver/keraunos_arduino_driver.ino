@@ -29,8 +29,9 @@ void setup() {
   drone3.begin();
 
   pinMode(13, OUTPUT);
+  pinMode(1, OUTPUT);
   on = true;
-  digitalWrite(13, HIGH);
+  digitalWrite(1, LOW);
 }
 
 void loop() {
@@ -50,7 +51,7 @@ void loop() {
       Serial.print("START");
       if(on == true){
         digitalWrite(13, LOW);
-        delay(100);
+        delay(200);
         //on = false;
         digitalWrite(13, HIGH);
       }
