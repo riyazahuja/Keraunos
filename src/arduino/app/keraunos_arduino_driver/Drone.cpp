@@ -6,7 +6,7 @@
 Drone::Drone(int pins[], bool valid)
 {
   _valid = valid;
-  for(int i=0; i<4; i++){
+  for(int i=0; i<4; i++){ 
     _pins[i] = pins[i];
   }
 }
@@ -28,16 +28,13 @@ void Drone::sendSignal(int pin_num, int val) {
   else val = 1;
 
   //send new val
-  for (int i = pin_num; i < 13; i= i+4) {
-    digitalWrite(i, val);
-  }
+  digitalWrite(pin_num, val);
 
   delay(100);
 
-  //need to reset button
-  for (int i = pin_num; i < 13; i = i+4) {
-    digitalWrite(i, ~val);
-  }
+  //need to reset button 
+  //TODO why was it ~val before? changed to zero
+  digitalWrite(pin_num, 0);
 
 }
 

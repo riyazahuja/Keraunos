@@ -16,28 +16,51 @@ Drone drone1(pins1, true);
 Drone drone2(pins2, true);
 Drone drone3(pins3, true);
 
+char recievedChar;
+bool on;
 
 void setup() {
-  Serial.begin(115200);
+  //115200 before, why?
+  Serial.begin(9600);
   Serial.setTimeout(1);
   
   drone1.begin();
   drone2.begin();
   drone3.begin();
 
+  pinMode(13, OUTPUT);
+  on = true;
+  digitalWrite(13, HIGH);
 }
 
 void loop() {
-  char recievedChar = '1';
 
   if (Serial.available() > 0) {
     recievedChar = Serial.read();
+    // say what you got:
+                Serial.print("I received: ");
+                Serial.println(recievedChar);
   }
 
-  Serial.print(recievedChar);
+  //Serial.print(recievedChar);
 
   switch (recievedChar)
   {
+    case 'f':
+      Serial.print("START");
+      if(on == true){
+        digitalWrite(13, LOW);
+        delay(100);
+        //on = false;
+        digitalWrite(13, HIGH);
+      }
+      else{
+        digitalWrite(13, HIGH);
+        on = true;
+      }
+        
+
+      break;
     case 'o':
       Serial.println("Up");
       drone1.sendLeftJoystickSignal(1, 0);
@@ -76,4 +99,6 @@ void loop() {
     default:
       break;
   }
+
+  recievedChar = 0;
 }
