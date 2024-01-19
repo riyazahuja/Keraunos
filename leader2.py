@@ -5,8 +5,9 @@ import pywinctl as pw
 from datetime import datetime
 import json
 from math import exp, ceil
+import torch
 
-
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def get_webcam():
     webcam = cv2.VideoCapture(1) 
     _, imageFrame = webcam.read() 
@@ -39,69 +40,48 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
     target_region = get_target_region(width, height, (0.25,0.25), (0.75,0.75))
 
     while True:
-        _, imageFrame = webcam.read() 
+        _, frame = webcam.read() 
 
-        # Your existing processing code starts here
-        # Convert the imageFrame in BGR(RGB color space) to HSV(hue-saturation-value) color space
-        hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
-        #imageFrame=hsvFrame
-
-
-        # Set range for red color and define mask
-        red_lower = np.array([136, 87, 111], np.uint8)
-        red_upper = np.array([180, 255, 255], np.uint8)
-        red_mask = cv2.inRange(hsvFrame, red_lower, red_upper)
 
         
-        # Morphological Transform, Dilation 
-        # for each color and bitwise_and operator 
-        # between imageFrame and mask determines 
-        # to detect only that particular color 
-        kernel = np.ones((5, 5), "uint8") 
+
+
+
+
+        # Inference
+        results = model(frame)
+
+        # Results
+        labels, cord = results.xyxyn[0][:, -1], results.xyxyn[0][:, :-1]
+        n = len(labels)
+        for i in range(n):
+            row = cord[i]
+            x1, y1, x2, y2 = int(row[0]*frame.shape[1]), int(row[1]*frame.shape[0]), int(row[2]*frame.shape[1]), int(row[3]*frame.shape[0])
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            label = results.names[int(labels[i])]
+            cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+        cv2.imshow("YOLOv5 Object Detection", frame)
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            cv2.destroyAllWindows()
+            break
         
-        # For red color 
-        red_mask = cv2.dilate(red_mask, kernel) 
-        res_red = cv2.bitwise_and(imageFrame, imageFrame,  
-                                mask = red_mask) 
+        a, b, c, d = target_region
+        cv2.rectangle(frame, (int(a), int(b)), (int(a + c), int(b + d)), (0, 255, 0), 2)
+        cv2.putText(frame, "Target", (int(a), int(b)), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                    (0, 255,0))  
         
 
-        # Creating contour to track red color 
-        contours, hierarchy = cv2.findContours(red_mask, 
-                                            cv2.RETR_TREE, 
-                                            cv2.CHAIN_APPROX_SIMPLE) 
-        
-        maxArea = None
-        maxContour = None
-        for pic, contour in enumerate(contours): 
-            area = cv2.contourArea(contour) 
-            if(area > 900) and (maxArea is None or area > maxArea):
-                maxArea = area
-                maxContour = contour
-        if(maxContour is not None):
-            x, y, w, h = cv2.boundingRect(maxContour) 
-            imageFrame = cv2.rectangle(imageFrame, (x, y),  
-                                    (x + w, y + h),  
-                                    (0, 0, 255), 2) 
-            
-            cv2.putText(imageFrame, "Red Colour", (x, y), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
-                        (0, 0, 255))     
-            
-            a, b, c, d = target_region
-            cv2.rectangle(imageFrame, (int(a), int(b)), (int(a + c), int(b + d)), (0, 255, 0), 2)
-            cv2.putText(imageFrame, "Target", (int(a), int(b)), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
-                        (0, 255,0))  
-            
+        data_out = calculateCommands((x1,y1,x2-x1,y2-y1),drone_id, target_region,(width,height))
+        print(data_out['drones'][drone_id])
+        export(data_out,'data.json')
 
-            data_out = calculateCommands((x,y,w,h),drone_id, target_region,(width,height))
-            print(data_out['drones'][drone_id])
-            export(data_out,'data.json')
 
 
 
         # Program Termination 
-        cv2.imshow("Multiple Color Detection in Real-Time", imageFrame) 
+        cv2.imshow("Multiple Color Detection in Real-Time", frame) 
         if cv2.waitKey(10) & 0xFF == ord('q'): 
             cv2.destroyAllWindows() 
             break
@@ -175,7 +155,7 @@ def export(data,path):
                 fc = json.load(file)
         except:
             pass
-
+        
         with open(path,'w') as file:
             if 'drones' not in fc.keys():
                 fc['drones']={}
