@@ -13,7 +13,7 @@ Drone::Drone(int pins[], bool valid)
 
 void Drone::begin()
 {
-  for(int i=0; i<12; i++){
+  for(int i=0; i<4; i++){
     pinMode(_pins[i], OUTPUT);
   }
   
@@ -32,11 +32,11 @@ void Drone::sendSignal(int pin_num, int val) {
     digitalWrite(i, val);
   }
 
-  delay(500);
+  delay(100);
 
   //need to reset button
   for (int i = pin_num; i < 13; i = i+4) {
-    digitalWrite(i, val);
+    digitalWrite(i, ~val);
   }
 
 }

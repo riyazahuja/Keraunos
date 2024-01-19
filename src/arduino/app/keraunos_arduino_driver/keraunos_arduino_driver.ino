@@ -18,7 +18,8 @@ Drone drone3(pins3, true);
 
 
 void setup() {
-  Serial.println("Arduino Ready!");
+  Serial.begin(115200);
+  Serial.setTimeout(1);
   
   drone1.begin();
   drone2.begin();
@@ -32,6 +33,8 @@ void loop() {
   if (Serial.available() > 0) {
     recievedChar = Serial.read();
   }
+
+  Serial.print(recievedChar);
 
   switch (recievedChar)
   {
