@@ -42,6 +42,8 @@ void Drone::sendLeftJoystickSignal(int z, int turn) {
   //changing zVel
   if (z != 0) {
     sendSignal(_pins[0], z);
+    delay(400);
+    sendSignal(_pins[0], LOW);
   }
 
   //changing turnAngle
