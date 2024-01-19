@@ -8,9 +8,9 @@ const int yVel = 0;
 
 //for each drone, pin 1 is zVel, pin 2 is turnAngle, pin3 is xVel, pin4 is yVel
 
-int pins1[4] = {1, 2, 3, 4};
-int pins2[4] = {5, 6, 7, 8};
-int pins3[4] = {9, 10, 11, 12};
+int pins1[4] = {2, 3, 4, 5};
+int pins2[4] = {6, 7, 8, 9};
+int pins3[4] = {10, 11, 12, 13};
 
 Drone drone1(pins1, true);
 Drone drone2(pins2, true);
@@ -21,7 +21,7 @@ bool on;
 
 void setup() {
   //115200 before, why?
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setTimeout(1);
   
   drone1.begin();
@@ -29,9 +29,12 @@ void setup() {
   drone3.begin();
 
   pinMode(13, OUTPUT);
-  pinMode(1, OUTPUT);
   on = true;
-  digitalWrite(1, LOW);
+
+  for (int i = 1; i < 13; i++) {
+    digitalWrite(i, LOW);
+  }
+  
 }
 
 void loop() {

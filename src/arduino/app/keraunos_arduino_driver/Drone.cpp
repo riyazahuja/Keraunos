@@ -30,7 +30,7 @@ void Drone::sendSignal(int pin_num, int val) {
   //send new val
   digitalWrite(pin_num, val);
 
-  delay(100);
+  delay(1000);
 
   //need to reset button 
   //TODO why was it ~val before? changed to zero
@@ -42,8 +42,6 @@ void Drone::sendLeftJoystickSignal(int z, int turn) {
   //changing zVel
   if (z != 0) {
     sendSignal(_pins[0], z);
-    delay(400);
-    sendSignal(_pins[0], LOW);
   }
 
   //changing turnAngle
