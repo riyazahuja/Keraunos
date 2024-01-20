@@ -5,8 +5,9 @@ import pywinctl as pw
 from datetime import datetime
 import json
 from math import exp, ceil
+import torch
 
-
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 def get_webcam():
     webcam = cv2.VideoCapture(1) 
     _, imageFrame = webcam.read() 
@@ -39,10 +40,9 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
     target_region = get_target_region(width, height, (0.25,0.25), (0.75,0.75))
 
     while True:
-        _, imageFrame = webcam.read() 
+        _, frame = webcam.read() 
+        imageFrame = frame
 
-        # Your existing processing code starts here
-        # Convert the imageFrame in BGR(RGB color space) to HSV(hue-saturation-value) color space
         hsvFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGR2HSV)
         #imageFrame=hsvFrame
 
@@ -74,10 +74,68 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
         maxContour = None
         for pic, contour in enumerate(contours): 
             area = cv2.contourArea(contour) 
-            if(area > 600) and (maxArea is None or area > maxArea):
+            if(area > 900) and (maxArea is None or area > maxArea):
                 maxArea = area
                 maxContour = contour
+
+
+
+        #If detect people and red, choose person with max overlap with red. if all have no overlap, choose red
+        # if detect people and no red, choose first person
+        # if detect red and no people, choose red
+
+
+
+
+
         if(maxContour is not None):
+            
+            # Inference
+            results = model(frame)
+
+            # Results
+            labels, cord = results.xyxyn[0][:, -1], results.xyxyn[0][:, :-1]
+            n = len(labels)
+            people = []
+            for i in range(n):
+                row = cord[i]
+                label = results.names[int(labels[i])]
+                if(label != 'person'):
+                    continue
+                
+
+
+                x1, y1, x2, y2 = int(row[0]*frame.shape[1]), int(row[1]*frame.shape[0]), int(row[2]*frame.shape[1]), int(row[3]*frame.shape[0])
+
+                people.append((x1,y1,x2-x1,y2-y1))
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)                
+                cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+
+            
+                
+
+
+            
+            a, b, c, d = target_region
+            cv2.rectangle(frame, (int(a), int(b)), (int(a + c), int(b + d)), (0, 255, 0), 2)
+            cv2.putText(frame, "Target", (int(a), int(b)), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, 
+                        (0, 255,0))  
+            
+
+
+            data_out = calculateCommands((x1,y1,x2-x1,y2-y1),drone_id, target_region,(width,height))
+            #print(data_out['drones'][drone_id])
+            export(data_out,'data.json')
+
+
+
+
+
+
+
+
+
             x, y, w, h = cv2.boundingRect(maxContour) 
             imageFrame = cv2.rectangle(imageFrame, (x, y),  
                                     (x + w, y + h),  
@@ -87,25 +145,93 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
                         cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
                         (0, 0, 255))     
             
-            a, b, c, d = target_region
-            cv2.rectangle(imageFrame, (int(a), int(b)), (int(a + c), int(b + d)), (0, 255, 0), 2)
-            cv2.putText(imageFrame, "Target", (int(a), int(b)), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
-                        (0, 255,0))  
+            
+            red = (x,y,w,h)
+
+            calc_data = (0,0,0,0)
+            if len(people) == 0:
+                calc_data = red
+            else:
+                intersects = {}
+                
+                for person in people:
+                    intersects[person] = intersection(red,person,width,height)
+                
+                max_person = None
+                max_inter = 0
+                for p,v in intersects.items():
+                    if v > max_inter:
+                        max_person = p
+                        max_inter = v
+                
+                if max_person == None:
+                    calc_data = red
+                else:
+                    calc_data = max_person
+
             
 
-            data_out = calculateCommands((x,y,w,h),drone_id, target_region,(width,height))
+            x, y, w, h = calc_data
+
+            imageFrame = cv2.rectangle(imageFrame, (x, y),  
+                                    (x + w, y + h),  
+                                    (255, 0, 0), 3) 
+            
+            cv2.putText(imageFrame, "Tracking Object", (x, y), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, 
+                        (255, 0, 0))     
+            
+
+
+
+
+
+
+
+            
+
+            data_out = calculateCommands(calc_data,drone_id, target_region,(width,height))
             print(data_out['drones'][drone_id])
             export(data_out,'data.json')
 
 
 
+
+
+
+
+
+
+
+
+
+
         # Program Termination 
-        cv2.imshow("Multiple Color Detection in Real-Time", imageFrame) 
+        cv2.imshow("Multiple Color Detection in Real-Time", frame) 
         if cv2.waitKey(10) & 0xFF == ord('q'): 
             cv2.destroyAllWindows() 
             break
 
+
+def intersection(A,B, ww, wh):
+    x0, y0, w0, h0 = A
+    x1, y1, w1, h1 = B
+    # Calculate the (x, y) coordinates of the intersection rectangle
+    intersect_top_left_x = max(x0, x1)
+    intersect_top_left_y = max(y0, y1)
+    intersect_bottom_right_x = min(x0 + w0, x1 + w1)
+    intersect_bottom_right_y = min(y0 + h0, y1 + h1)
+
+    # Calculate the width and height of the intersection rectangle
+    width = intersect_bottom_right_x - intersect_top_left_x
+    height = intersect_bottom_right_y - intersect_top_left_y
+
+    # Check if there is an intersection
+    if width > 0 and height > 0:
+        return (width * height)/(ww*wh)
+    else:
+        return 0
+    
 
 
 #dropoff function:
@@ -175,7 +301,7 @@ def export(data,path):
                 fc = json.load(file)
         except:
             pass
-
+        
         with open(path,'w') as file:
             if 'drones' not in fc.keys():
                 fc['drones']={}
