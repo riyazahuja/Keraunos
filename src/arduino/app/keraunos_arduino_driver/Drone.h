@@ -12,13 +12,17 @@ class Drone
   public:
     Drone(int pins[], bool valid);
     void begin();
-    void sendLeftJoystickSignal(int z, int turn);
-    void sendRightJoystickSignal(int x, int y);
+    void up();
+    void down();
+    void forward();
+    void back();
+    void left();
+    void right();
 
   private:
     void sendSignal(int pin_num, int val);
     bool _valid;
-    int _pins [4];
+    int _pins [6];
     
 
 };
