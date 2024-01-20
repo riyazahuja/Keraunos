@@ -7,14 +7,12 @@ const int xVel = 0;
 const int yVel = 0;
 
 
-//for each drone, pins[0] is zVel 1.5, pins[1] is zVel 5, pins[2] is xVel, pins[2] is yVel
-int pins1[4] = {2, 3, 4};
-int pins2[4] = {5, 6, 7};
-int pins3[4] = {8, 9, 10};
+// pin[0] is 1.5V zVel, pin[1] is 3V zVel
+// pin[2] is 1.5V xVel, pin[3] is 3V xVel
+// pin[4] is 1.5V yVel, pin[5] is 3V yVel
+int pins1[6] = {2, 3, 4, 5, 6};
 
 Drone drone1(pins1, true);
-Drone drone2(pins2, true);
-Drone drone3(pins3, true);
 
 char recievedChar;
 bool on;
@@ -25,8 +23,7 @@ void setup() {
   Serial.setTimeout(1);
   
   drone1.begin();
-  drone2.begin();
-  drone3.begin();
+
   on = true;
 
 }
