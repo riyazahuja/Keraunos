@@ -19,11 +19,11 @@ bool on;
 
 void setup() {
   //115200 before, why?
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.setTimeout(1);
   
   drone1.begin();
-
+  
   on = true;
 
 }
