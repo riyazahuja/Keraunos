@@ -6,11 +6,11 @@ const int turnAngle = 0;
 const int xVel = 0;
 const int yVel = 0;
 
-//for each drone, pin 1 is zVel, pin 2 is turnAngle, pin3 is xVel, pin4 is yVel
 
-int pins1[4] = {2, 3, 4, 5};
-int pins2[4] = {6, 7, 8, 9};
-int pins3[4] = {10, 11, 12, 13};
+//for each drone, pins[0] is zVel 1.5, pins[1] is zVel 5, pins[2] is xVel, pins[2] is yVel
+int pins1[4] = {2, 3, 4};
+int pins2[4] = {5, 6, 7};
+int pins3[4] = {8, 9, 10};
 
 Drone drone1(pins1, true);
 Drone drone2(pins2, true);
@@ -27,14 +27,8 @@ void setup() {
   drone1.begin();
   drone2.begin();
   drone3.begin();
-
-  pinMode(13, OUTPUT);
   on = true;
 
-  for (int i = 1; i < 13; i++) {
-    digitalWrite(i, LOW);
-  }
-  
 }
 
 void loop() {
@@ -50,54 +44,41 @@ void loop() {
 
   switch (recievedChar)
   {
-    case 'f':
-      Serial.print("START");
-      if(on == true){
-        digitalWrite(13, LOW);
-        delay(200);
-        //on = false;
-        digitalWrite(13, HIGH);
-      }
-      else{
-        digitalWrite(13, HIGH);
-        on = true;
-      }
-        
-
-      break;
+    
     case 'o':
       Serial.println("Up");
-      drone1.sendLeftJoystickSignal(1, 0);
+      drone1.up();
       break;
     case 'p':
       Serial.println("Down");
-      drone1.sendLeftJoystickSignal(-1, 0);
+      drone1.down();
       break;
 
+    /*
     case 'n':
       Serial.println("Turn Left");
-      drone1.sendLeftJoystickSignal(0, -1);
+      drone1.left();
       break;
     case 'm':
       Serial.println("Turn Right");
-      drone1.sendLeftJoystickSignal(0, 1);
+      drone1.right();
       break;
-
+    */
     case 'w':
       Serial.println("Forward");
-      drone1.sendRightJoystickSignal(0, 1);
+      drone1.forward();
       break; 
-    case 'a':
-      Serial.println("Left");
-      drone1.sendRightJoystickSignal(-1, 0);
-      break;
     case 's':
       Serial.println("Back");
-      drone1.sendRightJoystickSignal(0, -1);
+      drone1.back();
+      break;
+    case 'a':
+      Serial.println("Left");
+      drone1.left();
       break;
     case 'd':
       Serial.println("Right");
-      drone1.sendRightJoystickSignal(1, 0);
+      drone1.right();
       break;
 
     default:

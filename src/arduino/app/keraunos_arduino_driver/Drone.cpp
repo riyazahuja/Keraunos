@@ -3,67 +3,106 @@
 #include "Drone.h"
 
 //note: arduino digital pins output 5V or 0V
+
+// pin[0] is 1.5V zVel, pin[1] is 3V zVel
+// pin[2] is 1.5V xVel, pin[3] is 3V xVel
+// pin[4] is 1.5V yVel, pin[5] is 3V yVel
 Drone::Drone(int pins[], bool valid)
 {
   _valid = valid;
-  for(int i=0; i<4; i++){ 
+  for(int i=0; i<6; i++){ 
     _pins[i] = pins[i];
   }
 }
 
 void Drone::begin()
 {
-  for(int i=0; i<4; i++){
+  for(int i=0; i<6; i++){
     pinMode(_pins[i], OUTPUT);
   }
   
+  //neutral joystick position is 1.5V
+  digitalWrite(_pins[0], HIGH);
+  digitalWrite(_pins[2], HIGH);
+  digitalWrite(_pins[4], HIGH);
+
+
 }
 
-void Drone::sendSignal(int pin_num, int val) {
-  //to go forward w joystick, need to add 1,5V, to go back need to subtract 1.5
-  //joystick remains at 1.5V when not moved
-  //maybe needs extra pin to specify whether positive or negative?
+void Drone::up(){
+
+  //up is 3V zVel joystick, small nudge upwards
+  //adjust delay for shorter nudge upwards
+  digitalWrite(_pins[1], HIGH);
+  delay(200);
+  digitalWrite(_pins[1], LOW);
+
+  //back to neutral joystick position, sanity check
+  digitalWrite(_pins[0], HIGH);
+
+}
+
+void Drone::down(){
+
+  //down is 0V zVel joystick, small nudge down
+  //adjust delay for shorter nudge down
+  //both neutral needs to be pulled low
+  digitalWrite(_pins[0], LOW);
+  digitalWrite(_pins[1], LOW);
+  delay(200);
+  //back to neutral joystick position
+  digitalWrite(_pins[0], HIGH);
   
-  if (val < 0) val = 0;
-  else val = 1;
-
-  //send new val
-  digitalWrite(pin_num, val);
-
-  delay(1000);
-
-  //need to reset button 
-  //TODO why was it ~val before? changed to zero
-  digitalWrite(pin_num, 0);
-
 }
 
-void Drone::sendLeftJoystickSignal(int z, int turn) {
-  //changing zVel
-  if (z != 0) {
-    sendSignal(_pins[0], z);
-  }
+void Drone::forward(){
 
-  //changing turnAngle
-  else if (turn != 0) {
-    sendSignal(_pins[1], turn);
-  }
+  //forward is 3V yVel joystick, small nudge up
+  //adjust delay for shorter nudge 
+  digitalWrite(_pins[5], HIGH);
+  delay(200);
+  digitalWrite(_pins[5], LOW);
+
+  //back to neutral joystick position sanity check
+  digitalWrite(_pins[4], HIGH);
+  
 }
 
-void Drone::sendRightJoystickSignal(int x, int y) {
-  //changing xVel
-  if (x != 0) {
-    sendSignal(_pins[2], x);
-  }
+void Drone::back(){
 
-  //changing yVel
-  else if (y != 0) {
-    sendSignal(_pins[3], y);
-  }
-
+  //back is 0V yVel joystick, small nudge down
+  //adjust delay for shorter nudge down
+  //both neutral needs to be pulled low
+  digitalWrite(_pins[4], LOW);
+  digitalWrite(_pins[5], LOW);
+  delay(200);
+  //back to neutral joystick position
+  digitalWrite(_pins[4], HIGH);
 }
 
 
+void Drone::left(){
 
+  //left is 0V xVel joystick, small nudge down
+  //adjust delay for shorter nudge down
+  //both neutral needs to be pulled low
+  digitalWrite(_pins[2], LOW);
+  digitalWrite(_pins[3], LOW);
+  delay(200);
+  //back to neutral joystick position
+  digitalWrite(_pins[2], HIGH);
+}
 
+void Drone::right(){
+
+  //right is 3V xVel joystick, small nudge up
+  //adjust delay for shorter nudge 
+  digitalWrite(_pins[3], HIGH);
+  delay(200);
+  digitalWrite(_pins[3], LOW);
+
+  //back to neutral joystick position sanity check
+  digitalWrite(_pins[2], HIGH);
+
+}
 
