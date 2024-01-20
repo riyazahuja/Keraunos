@@ -1,5 +1,7 @@
 import pygame
-
+from math import ceil
+import json
+from datetime import datetime
 pygame.init()
 
 
@@ -45,11 +47,18 @@ def main():
     joysticks = {}
 
     done = False
+    #zero_st = datetime.now()
     while not done:
         # Event processing step.
         # Possible joystick events: JOYAXISMOTION, JOYBALLMOTION, JOYBUTTONDOWN,
         # JOYBUTTONUP, JOYHATMOTION, JOYDEVICEADDED, JOYDEVICEREMOVED
-        for event in pygame.event.get():
+        try:
+            events = pygame.event.get()
+        except:
+            continue
+        
+
+        for event in events:
             if event.type == pygame.QUIT:
                 done = True  # Flag that we are done so we exit this loop.
 
@@ -110,30 +119,91 @@ def main():
             text_print.tprint(screen, f"Number of axes: {axes}")
             text_print.indent()
 
-            for i in range(axes):
-                axis = joystick.get_axis(i)
-                text_print.tprint(screen, f"Axis {i} value: {axis:>6.3f}")
-            text_print.unindent()
 
-            buttons = joystick.get_numbuttons()
-            text_print.tprint(screen, f"Number of buttons: {buttons}")
-            text_print.indent()
 
-            for i in range(buttons):
-                button = joystick.get_button(i)
-                text_print.tprint(screen, f"Button {i:>2} value: {button}")
-            text_print.unindent()
+            
 
-            hats = joystick.get_numhats()
-            text_print.tprint(screen, f"Number of hats: {hats}")
-            text_print.indent()
+            #axis 1
+            axis = joystick.get_axis(1)
+            up = -axis if axis <= 0 else 0
+            down = axis if axis >= 0 else 0
 
-            # Hat position. All or nothing for direction, not a float like
-            # get_axis(). Position is a tuple of int values (x, y).
-            for i in range(hats):
-                hat = joystick.get_hat(i)
-                text_print.tprint(screen, f"Hat {i} value: {str(hat)}")
-            text_print.unindent()
+            up = ceil(up*100)
+            down = ceil(down*100)
+
+            text_print.tprint(screen, f"up: {(up)}")
+            text_print.tprint(screen, f"down: {(down)}")
+
+
+            #axis 2
+            axis = joystick.get_axis(0)
+            turnr = axis if axis >= 0 else 0
+            turnl = -axis if axis <= 0 else 0
+
+            turnr = ceil(turnr*100)
+            turnl = ceil(turnl*100)
+
+            text_print.tprint(screen, f"turnr: {(turnr)}")
+            text_print.tprint(screen, f"turnl: {(turnl)}")
+
+            #axis 3
+            axis = joystick.get_axis(3)
+            forward = -axis if axis <= 0 else 0
+            back = axis if axis >= 0 else 0
+
+            forward = ceil(forward*100)
+            back = ceil(back*100)
+
+            text_print.tprint(screen, f"forward: {(forward)}")
+            text_print.tprint(screen, f"back: {(back)}")
+            drone_id = 1
+            role = 'LEADER'
+
+            #if(turnl == 0 and turnr == 0 and up == 0 and down == 0 and forward == 0 and back == 0 and (datetime.now()-zero_st).total_seconds() <= 0.1):
+            #    zero_st = datetime.now()
+            #    continue
+
+            data = {
+                'drones': {
+                    drone_id : {
+                        'time': datetime.now().isoformat(),
+                        'role': role,
+                        'turnl': (turnl),
+                        'turnr': (turnr),
+                        'up': (up),
+                        'down': (down),
+                        'forward': (forward),
+                        'back': (back)
+                    }
+                }
+            }
+
+            export(data)
+            
+            # for i in range(axes):
+            #     axis = joystick.get_axis(i)
+            #     text_print.tprint(screen, f"Axis {i} value: {axis:>6.3f}")
+            # text_print.unindent()
+
+            # buttons = joystick.get_numbuttons()
+            # text_print.tprint(screen, f"Number of buttons: {buttons}")
+            # text_print.indent()
+
+            # for i in range(buttons):
+            #     button = joystick.get_button(i)
+            #     text_print.tprint(screen, f"Button {i:>2} value: {button}")
+            # text_print.unindent()
+
+            # hats = joystick.get_numhats()
+            # text_print.tprint(screen, f"Number of hats: {hats}")
+            # text_print.indent()
+
+            # # Hat position. All or nothing for direction, not a float like
+            # # get_axis(). Position is a tuple of int values (x, y).
+            # for i in range(hats):
+            #     hat = joystick.get_hat(i)
+            #     text_print.tprint(screen, f"Hat {i} value: {str(hat)}")
+            # text_print.unindent()
 
             text_print.unindent()
 
@@ -143,9 +213,35 @@ def main():
         # Limit to 30 frames per second.
         clock.tick(30)
 
+def export(data,path = 'data.json'):
+    try:
+        fc = {}
+        try:
+            with open(path, 'r') as file:
+                fc = json.load(file)
+        except:
+            pass
+        
+        with open(path,'w') as file:
+            if 'drones' not in fc.keys():
+                fc['drones']={}
+            for k,v in data.items():
+                fc['drones'][k]=v
+            
+            json.dump(fc, file, indent=4)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
     main()
+    # while True:
+    #     try:
+    #         main()
+    #     except KeyError:
+    #         break
+    #     except:
+    #         break
     # If you forget this line, the program will 'hang'
     # on exit if running from IDLE.
     pygame.quit()
