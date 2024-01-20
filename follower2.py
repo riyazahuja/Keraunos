@@ -95,6 +95,9 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
             
 
             data_out = calculateCommands((x,y,w,h),drone_id, target_region,(width,height))
+            # Pull in json data, copy data from leader drone, weighted average based on 
+            # difference of time stamp of current commands and leader drone command.
+            adjust_follower_data(data_out)
             print(data_out['drones'][drone_id])
             export(data_out,'data.json')
 
@@ -167,14 +170,31 @@ def calculateCommands(actual_region, drone_id, target_region, window):
     return data
 
 
+def import_json_data(path):
+    fc = {}
+    try:
+        with open(path, 'r') as file:
+            fc = json.load(file)
+            return fc
+    except:
+        pass
+
+
+def import_leader_data(path):
+    fc = import_json_data(path)
+    return fc['drones'][1]
+
+
+def adjust_follower_data(follower_data):
+    leader_data = import_leader_data('data.json')
+    # take weighted avg of follower data and leader data based on time stamp difference of
+    # follower command and leader command.
+    pass
+
+
 def export(data,path):
     try:
-        fc = {}
-        try:
-            with open(path, 'r') as file:
-                fc = json.load(file)
-        except:
-            pass
+        fc = import_json_data(path)
 
         with open(path,'w') as file:
             if 'drones' not in fc.keys():
