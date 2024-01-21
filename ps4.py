@@ -85,11 +85,11 @@ def main():
                 # joystick, filling up the list without needing to create them manually.
                 joy = pygame.joystick.Joystick(event.device_index)
                 joysticks[joy.get_instance_id()] = joy
-                print(f"Joystick {joy.get_instance_id()} connencted")
+                #print(f"Joystick {joy.get_instance_id()} connencted")
 
             if event.type == pygame.JOYDEVICEREMOVED:
                 del joysticks[event.instance_id]
-                print(f"Joystick {event.instance_id} disconnected")
+                #print(f"Joystick {event.instance_id} disconnected")
 
         # Drawing step
         # First, clear the screen to white. Don't put other drawing commands
@@ -171,19 +171,17 @@ def main():
             #    continue
 
             data = {
-                drone_id : {
-                    'time': datetime.now().isoformat(),
-                    'role': role,
-                    'turnl': (turnl),
-                    'turnr': (turnr),
-                    'up': (up),
-                    'down': (down),
-                    'forward': (forward),
-                    'back': (back)
-                }
+                'time': datetime.now().isoformat(),
+                'role': role,
+                'turnl': int(turnl >= 80),
+                'turnr': int(turnr >= 80),
+                'up': int(up >= 80),
+                'down': int(down >= 80),
+                'forward': int(forward >= 80),
+                'back': int(back >= 80)
             }
 
-            export(data)
+            export2(data,str(drone_id))
             
             # for i in range(axes):
             #     axis = joystick.get_axis(i)
@@ -213,16 +211,16 @@ def main():
             text_print.unindent()
 
         # print follower data by pulling it out of data.json
-        data = import_json_data()
-        if data is None:
-            print("no data yet")
-        else:
-            drones_data = data['drones']
-            for drone_id,_ in drones_data.items():
-                drone_data = drones_data[drone_id]
-                text_print.tprint(screen, f"{drone_id}")
-                for k,v in drone_data.items():
-                    text_print.tprint(screen, f"{k}, {(v)}")
+        # data = import_json_data()
+        # if data is None:
+        #     print("no data yet")
+        # else:
+        #     drones_data = data['drones']
+        #     for drone_id,_ in drones_data.items():
+        #         drone_data = drones_data[drone_id]
+        #         text_print.tprint(screen, f"{drone_id}")
+        #         for k,v in drone_data.items():
+        #             text_print.tprint(screen, f"{k}, {(v)}")
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
@@ -230,7 +228,36 @@ def main():
         # Limit to 30 frames per second.
         clock.tick(30)
 
-def export(data,path = 'data.json'):
+
+
+
+# def export(data,path = 'data.json'):
+#     try:
+#         fc = {}
+#         try:
+#             with open(path, 'r') as file:
+#                 fc = json.load(file)
+#                 #print(fc)
+#         except:
+#             pass
+        
+#         with open(path,'w') as file:
+#             if 'drones' not in fc.keys():
+#                 fc['drones']={}
+
+#             print(data.items())
+#             for k,v in data.items():
+                
+#                 fc['drones'][k]=v
+            
+#             #print(fc)
+#             json.dump(fc, file, indent=4)
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+
+def export2(data, drone_id, path='data.json'):
+    #print(f"drone_id type: {type(drone_id)}")
+    #print()
     try:
         fc = {}
         try:
@@ -238,16 +265,47 @@ def export(data,path = 'data.json'):
                 fc = json.load(file)
         except:
             pass
-        
-        with open(path,'w') as file:
+        #print(fc)
+        with open(path, 'w') as file:
             if 'drones' not in fc.keys():
-                fc['drones']={}
-            for k,v in data.items():
-                fc['drones'][k]=v
+                fc['drones'] = {}
+            if drone_id not in fc['drones'].keys():
+                fc['drones'][drone_id] = {}
+            
+            fc['drones'][drone_id] = data
+            json.dump(fc, file, indent=4)
+            #print(fc)
+            #print()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        pass
+        
+
+        
+def export(data, drone_id, path='data.json'):
+    try:
+        fc = {}
+        try:
+            with open(path, 'r') as file:
+                fc = json.load(file)
+        except:
+            pass
+
+        with open(path, 'w') as file:
+            if 'drones' not in fc.keys():
+                fc['drones'] = {}
+
+            if drone_id not in fc['drones'].keys():
+                fc['drones']['ps4'] = {}
+
+            # Use the timestamp as a key to ensure uniqueness
+            timestamp = data['ps4']['time']
+            fc['drones']['ps4'][timestamp] = data[drone_id]
             
             json.dump(fc, file, indent=4)
     except Exception as e:
         print(f"An error occurred: {e}")
+
 
 
 if __name__ == "__main__":

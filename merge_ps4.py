@@ -101,21 +101,20 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
             # if detect red and no people, choose red 
 
 
-            # if(maxContour is None):
-            #     role = 'LEADER' if drone_id == 1 else 'FOLLOWER'
-            #     data_out = {
-            #     'time': datetime.now().isoformat(),
-            #     'role': role,
-            #     'turnl': 0,
-            #     'turnr':0,
-            #     'up':0,
-            #     'down': 0,
-            #     'forward': 0,
-            #     'back': 0
-            #     }
+            if(maxContour is None):
+                role = 'LEADER' if drone_id == 1 else 'FOLLOWER'
+                data_out = {
+                'time': datetime.now().isoformat(),
+                'role': role,
+                'turnl': 1,
+                'turnr':0,
+                'up':0,
+                'down': 0,
+                'forward': 0,
+                'back': 0
+                }
                 
-            #     export2(data_out, str(drone_id), 'data.json')
-                
+                export2(data_out, str(drone_id), 'data.json')
 
 
             if(maxContour is not None):
@@ -166,7 +165,7 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
                 
                 calc_data = (0,0,0,0)
                 if len(people) == 0:
-                    calc_data = red
+                    pass
                 else:
                     intersects = {}
                     
@@ -204,7 +203,8 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
                     for k,v in data_out.items():
                         if (type(v) is int):
                             data_out[k] = 0
-                    
+
+
 
 
                 export2(data_out, str(drone_id), 'data.json')
@@ -258,12 +258,12 @@ def calculateCommands(actual_region, drone_id, target_region, window):
     warea = ww*wh
 
     turnl=turnr=up=down=forward=back = 0
-    AREA_GRAN = 10
+    AREA_GRAN = 1
     
     area = AREA_GRAN*area
 
     if area < area0:
-        forward = (area0-area)/warea* 100
+        forward = (area0-area)/warea* 120
     elif area > area0:
         back = (area-area0)/warea* 100
     
