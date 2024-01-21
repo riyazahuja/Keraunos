@@ -12,7 +12,7 @@ from math import exp, ceil
 path = 'data.json'
 
 def get_webcam():
-    webcam = cv2.VideoCapture(1) 
+    webcam = cv2.VideoCapture(0) 
     _, imageFrame = webcam.read() 
     return imageFrame
 
@@ -196,7 +196,7 @@ def merge(course_correction, drone_id, path = path):
         leader_data = leader_data['drones'][1]
 
         
-    self_data = course_correction['drones'][drone_id]
+    self_data = course_correction[drone_id]
 
     leader_time, self_time = datetime.fromisoformat(leader_data['time']), datetime.fromisoformat(self_data['time'])
     td = abs((leader_time-self_time).total_seconds)
@@ -226,7 +226,7 @@ def export(data,path):
             if 'drones' not in fc.keys():
                 fc['drones']={}
             for k,v in data.items():
-                fc['drones'][k]=v
+                fc[k]=v
             
             json.dump(fc, file, indent=4)
     except Exception as e:

@@ -20,9 +20,11 @@ void Drone::begin()
   for(int i=0; i<6; i++){
     pinMode(_pins[i], OUTPUT);
   }
+
   
   //neutral joystick position is 1.5V
   digitalWrite(_pins[0], HIGH);
+
   digitalWrite(_pins[2], HIGH);
   digitalWrite(_pins[4], HIGH);
 
@@ -53,7 +55,7 @@ void Drone::down(){
   //both neutral needs to be pulled low
   digitalWrite(_pins[0], LOW);
   digitalWrite(_pins[1], LOW);
-  delay(800);
+  delay(1000);
   //back to neutral joystick position
   digitalWrite(_pins[0], HIGH);
   
@@ -63,12 +65,12 @@ void Drone::forward(){
 
   //forward is 3V yVel joystick, small nudge up
   //adjust delay for shorter nudge 
-  digitalWrite(_pins[5], HIGH);
-  delay(200);
-  digitalWrite(_pins[5], LOW);
+  digitalWrite(_pins[3], HIGH);
+  delay(800);
+  digitalWrite(_pins[3], LOW);
 
   //back to neutral joystick position sanity check
-  digitalWrite(_pins[4], HIGH);
+  digitalWrite(_pins[2], HIGH);
   
 }
 
@@ -77,11 +79,11 @@ void Drone::back(){
   //back is 0V yVel joystick, small nudge down
   //adjust delay for shorter nudge down
   //both neutral needs to be pulled low
-  digitalWrite(_pins[4], LOW);
-  digitalWrite(_pins[5], LOW);
-  delay(200);
+  digitalWrite(_pins[2], LOW);
+  digitalWrite(_pins[3], LOW);
+  delay(1000);
   //back to neutral joystick position
-  digitalWrite(_pins[4], HIGH);
+  digitalWrite(_pins[2], HIGH);
 }
 
 
@@ -90,23 +92,23 @@ void Drone::left(){
   //left is 0V xVel joystick, small nudge down
   //adjust delay for shorter nudge down
   //both neutral needs to be pulled low
-  digitalWrite(_pins[2], LOW);
-  digitalWrite(_pins[3], LOW);
-  delay(200);
+  digitalWrite(_pins[4], LOW);
+  digitalWrite(_pins[5], LOW);
+  delay(1000);
   //back to neutral joystick position
-  digitalWrite(_pins[2], HIGH);
+  digitalWrite(_pins[4], HIGH);
 }
 
 void Drone::right(){
 
   //right is 3V xVel joystick, small nudge up
   //adjust delay for shorter nudge 
-  digitalWrite(_pins[3], HIGH);
-  delay(200);
-  digitalWrite(_pins[3], LOW);
+  digitalWrite(_pins[5], HIGH);
+  delay(800);
+  digitalWrite(_pins[5], LOW);
 
   //back to neutral joystick position sanity check
-  digitalWrite(_pins[2], HIGH);
+  digitalWrite(_pins[4], HIGH);
 
 }
 

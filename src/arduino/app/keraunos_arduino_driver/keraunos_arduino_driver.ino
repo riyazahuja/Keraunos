@@ -10,7 +10,7 @@ const int yVel = 0;
 // pin[0] is 1.5V zVel, pin[1] is 3V zVel
 // pin[2] is 1.5V xVel, pin[3] is 3V xVel
 // pin[4] is 1.5V yVel, pin[5] is 3V yVel
-int pins1[6] = {2, 3, 4, 5, 6};
+int pins1[6] = {2, 3, 4, 5, 6, 7};
 
 Drone drone1(pins1, true);
 
@@ -25,6 +25,7 @@ void setup() {
   drone1.begin();
   
   on = true;
+
 
 }
 
