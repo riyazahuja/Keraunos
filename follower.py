@@ -38,7 +38,6 @@ def capture_app_window(drone_id, app_title = 'DE FPV'):
             # Convert to BGR format for OpenCV
             imageFrame = cv2.cvtColor(imageFrame, cv2.COLOR_BGRA2BGR)
 
-            imageFrame = get_webcam()
 
             # Your existing processing code starts here
             # Convert the imageFrame in BGR(RGB color space) to HSV(hue-saturation-value) color space

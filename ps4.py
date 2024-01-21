@@ -29,6 +29,13 @@ class TextPrint:
     def unindent(self):
         self.x -= 10
 
+def import_json_data(path):
+    try:
+        with open(path, 'r') as file:
+            fc = json.load(file)
+            return fc
+    except:
+        return None
 
 def main():
     # Set the width and height of the screen (width, height), and name the window.
