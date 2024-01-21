@@ -196,7 +196,7 @@ def calculate_cc(actual_region, drone_id, target_region, window):
 
     return data
 
-def import_json_data(path):
+def import_json_data(path='data.json'):
     try:
         with open(path, 'r') as file:
             fc = json.load(file)
@@ -205,7 +205,7 @@ def import_json_data(path):
         return None
 
 def merge(course_correction, drone_id, path = path):
-    leader_data = import_json_data(path)
+    leader_data = import_json_data(path=path)
     if leader_data is None:
         # Leader drone not turned on yet.
         return course_correction
