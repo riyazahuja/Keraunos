@@ -9,6 +9,7 @@ mss==9.0.1
 numpy==1.26.3
 opencv-python==4.9.0.80
 opencv-python-headless==4.9.0.80
+pygame==2.5.2
 PyGetWindow==0.0.9
 PyMonCtl==0.7
 pyPS4Controller==1.2.5

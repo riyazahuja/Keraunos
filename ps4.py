@@ -217,9 +217,12 @@ def main():
         if data is None:
             print("no data yet")
         else:
-            follower_1_data = data['drones']['2']
-            follower_2_data = data['drones']['3']
-            text_print.tprint(screen, f"", {()})
+            drones_data = data['drones']
+            for drone_id,_ in drones_data.items():
+                drone_data = drones_data[drone_id]
+                text_print.tprint(screen, f"{drone_id}")
+                for k,v in drone_data.items():
+                    text_print.tprint(screen, f"{k}, {(v)}")
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
