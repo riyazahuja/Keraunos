@@ -1,16 +1,14 @@
 {
     "drones": {
-        "drones": {
-            "1": {
-                "time": "2024-01-20T16:34:53.243300",
-                "role": "LEADER",
-                "turnl": 2,
-                "turnr": 0,
-                "up": 3,
-                "down": 0,
-                "forward": 0,
-                "back": 2
-            }
+        "1": {
+            "time": "2024-01-20T16:34:53.243300",
+            "role": "LEADER",
+            "turnl": 2,
+            "turnr": 0,
+            "up": 3,
+            "down": 0,
+            "forward": 0,
+            "back": 2
         }
     }
 }

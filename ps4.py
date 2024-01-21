@@ -164,17 +164,15 @@ def main():
             #    continue
 
             data = {
-                'drones': {
-                    drone_id : {
-                        'time': datetime.now().isoformat(),
-                        'role': role,
-                        'turnl': (turnl),
-                        'turnr': (turnr),
-                        'up': (up),
-                        'down': (down),
-                        'forward': (forward),
-                        'back': (back)
-                    }
+                drone_id : {
+                    'time': datetime.now().isoformat(),
+                    'role': role,
+                    'turnl': (turnl),
+                    'turnr': (turnr),
+                    'up': (up),
+                    'down': (down),
+                    'forward': (forward),
+                    'back': (back)
                 }
             }
 
@@ -206,6 +204,10 @@ def main():
             # text_print.unindent()
 
             text_print.unindent()
+
+        # print follower data by pulling it out of data.json
+        
+        text_print.tprint(screen, f"", {()})
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
