@@ -29,6 +29,13 @@ class TextPrint:
     def unindent(self):
         self.x -= 10
 
+def import_json_data(path='data.json'):
+    try:
+        with open(path, 'r') as file:
+            fc = json.load(file)
+            return fc
+    except:
+        return None
 
 def main():
     # Set the width and height of the screen (width, height), and name the window.
@@ -206,8 +213,13 @@ def main():
             text_print.unindent()
 
         # print follower data by pulling it out of data.json
-        
-        text_print.tprint(screen, f"", {()})
+        data = import_json_data()
+        if data is None:
+            print("no data yet")
+        else:
+            follower_1_data = data['drones']['2']
+            follower_2_data = data['drones']['3']
+            text_print.tprint(screen, f"", {()})
 
         # Go ahead and update the screen with what we've drawn.
         pygame.display.flip()
