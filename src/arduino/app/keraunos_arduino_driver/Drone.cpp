@@ -94,7 +94,7 @@ void Drone::left(){
   //both neutral needs to be pulled low
   digitalWrite(_pins[4], LOW);
   digitalWrite(_pins[5], LOW);
-  delay(70);
+  delay(90);
   //back to neutral joystick position
   digitalWrite(_pins[4], HIGH);
 }
@@ -104,7 +104,7 @@ void Drone::right(){
   //right is 3V xVel joystick, small nudge up
   //adjust delay for shorter nudge 
   digitalWrite(_pins[5], HIGH);
-  delay(70);
+  delay(90);
   digitalWrite(_pins[5], LOW);
 
   //back to neutral joystick position sanity check

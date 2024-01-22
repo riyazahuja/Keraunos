@@ -8,7 +8,7 @@ turnAngle = 0
 xVel = 0
 yVel = 0
 
-arduino = serial.Serial(port='/dev/cu.usbmodem2101', baudrate=9600, timeout=0.1)
+arduino = serial.Serial(port='/dev/cu.usbmodem213401', baudrate=9600, timeout=0.1)
 
 def write_read(x):
     arduino.write(bytes(x, 'utf-8'))
